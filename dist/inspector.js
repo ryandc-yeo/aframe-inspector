@@ -2,7 +2,7 @@
   // webpackBootstrap
   /******/ var __webpack_modules__ = {
     /***/ './node_modules/@emotion/cache/dist/emotion-cache.browser.esm.js':
-      /*!***********************************************************************!*\
+      /*! ***********************************************************************!*\
   !*** ./node_modules/@emotion/cache/dist/emotion-cache.browser.esm.js ***!
   \***********************************************************************/
       /***/ (
@@ -160,8 +160,8 @@
             return;
           }
 
-          var value = element.value,
-            parent = element.parent;
+          var value = element.value;
+          var parent = element.parent;
           var isImplicitRule =
             element.column === parent.column && element.line === parent.line;
 
@@ -207,7 +207,7 @@
               value.charCodeAt(2) === 98
             ) {
               // this ignores label
-              element['return'] = '';
+              element.return = '';
               element.value = '';
             }
           }
@@ -320,7 +320,7 @@
         var nullifyElement = function nullifyElement(element) {
           element.type = '';
           element.value = '';
-          element['return'] = '';
+          element.return = '';
           element.children = '';
           element.props = '';
         };
@@ -617,7 +617,7 @@
                   1 -
                   length >
                 6
-              )
+              ) {
                 switch (
                   (0, stylis__WEBPACK_IMPORTED_MODULE_4__.charat)(
                     value,
@@ -632,8 +632,9 @@
                         value,
                         length + 4
                       ) !== 45
-                    )
+                    ) {
                       break;
+                    }
                   // (f)ill-available, (f)it-content
 
                   case 102:
@@ -671,6 +672,7 @@
                         ) + value
                       : value;
                 }
+              }
               break;
             // position: sticky
 
@@ -681,8 +683,9 @@
                   value,
                   length + 1
                 ) !== 115
-              )
+              ) {
                 break;
+              }
             // display: (flex|inline-flex)
 
             case 6444:
@@ -798,11 +801,11 @@
         }
 
         var prefixer = function prefixer(element, index, children, callback) {
-          if (element.length > -1)
-            if (!element['return'])
+          if (element.length > -1) {
+            if (!element.return) {
               switch (element.type) {
                 case stylis__WEBPACK_IMPORTED_MODULE_5__.DECLARATION:
-                  element['return'] = prefix(element.value, element.length);
+                  element.return = prefix(element.value, element.length);
                   break;
 
                 case stylis__WEBPACK_IMPORTED_MODULE_5__.KEYFRAMES:
@@ -820,7 +823,7 @@
                   );
 
                 case stylis__WEBPACK_IMPORTED_MODULE_5__.RULESET:
-                  if (element.length)
+                  if (element.length) {
                     return (0, stylis__WEBPACK_IMPORTED_MODULE_4__.combine)(
                       element.props,
                       function (value) {
@@ -912,7 +915,10 @@
                         return '';
                       }
                     );
+                  }
               }
+            }
+          }
         };
 
         var defaultStylisPlugins = [prefixer];
@@ -1009,8 +1015,8 @@
               true
                 ? function (element) {
                     if (!element.root) {
-                      if (element['return']) {
-                        currentSheet.insert(element['return']);
+                      if (element.return) {
+                        currentSheet.insert(element.return);
                       } else if (
                         element.value &&
                         element.type !==
@@ -1090,7 +1096,7 @@
       },
 
     /***/ './node_modules/@emotion/hash/dist/emotion-hash.esm.js':
-      /*!*************************************************************!*\
+      /*! *************************************************************!*\
   !*** ./node_modules/@emotion/hash/dist/emotion-hash.esm.js ***!
   \*************************************************************/
       /***/ (
@@ -6414,8 +6420,31 @@ styleSheet.flush()
               }
             },
             {
+              key: 'propertyNotify',
+              value: function propertyNotify() {
+                // borrowed from widget above
+                var value =
+                  this.props.schema.type === 'selector'
+                    ? this.props.entity.getDOMAttribute(
+                        this.props.componentname
+                      )[this.props.name]
+                    : this.props.data;
+                window.dispatchEvent(
+                  new CustomEvent('inspectorPropertyUpdate', {
+                    detail: {
+                      id: this.props.entity.id,
+                      component: this.props.componentname,
+                      property: this.props.name,
+                      value: value
+                    }
+                  })
+                );
+              }
+            },
+            {
               key: 'render',
               value: function render() {
+                var _this2 = this;
                 var props = this.props;
                 var value =
                   props.schema.type === 'selector'
@@ -6449,7 +6478,18 @@ styleSheet.flush()
                         htmlFor: this.id,
                         className: 'text',
                         title: title,
-                        children: props.name
+                        children: /*#__PURE__*/ (0,
+                        react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(
+                          'a',
+                          {
+                            onClick: function onClick(event) {
+                              _this2.propertyNotify();
+                              event.preventDefault();
+                              event.stopPropagation();
+                            },
+                            children: props.name
+                          }
+                        )
                       }
                     ),
                     this.getWidget(props.schema.type)
@@ -9271,6 +9311,9 @@ styleSheet.flush()
               _assertThisInitialized(_this),
               'rebuildEntityOptions',
               function () {
+                console.log(
+                  'AFRAME Inspector received event rebuildEntityOptions'
+                );
                 var entities = [
                   {
                     depth: 0,
@@ -9533,6 +9576,17 @@ styleSheet.flush()
                 ),
                 500
               );
+            // JB
+            console.log('Adding rebuildInspectorSceneGraph');
+            window.addEventListener(
+              'rebuildInspectorSceneGraph',
+              function (event) {
+                _this.rebuildEntityOptions();
+                _lib_Events__WEBPACK_IMPORTED_MODULE_4__['default'].emit(
+                  'refreshsidebarobject3d'
+                );
+              }
+            );
             return _this;
           }
           _createClass(SceneGraph, [
@@ -10077,6 +10131,16 @@ styleSheet.flush()
                         className: watcherClassNames,
                         title: watcherTitle,
                         onClick: this.writeChanges
+                      }),
+                      /*#__PURE__*/ (0,
+                      react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)('a', {
+                        title: 'Copy entity HTML to clipboard',
+                        'data-action': 'copy-entity-to-clipboard',
+                        className: 'button fa fa-clipboard',
+                        style: {
+                          float: 'right',
+                          marginRight: '5px'
+                        }
                       })
                     ]
                   })
@@ -29228,8 +29292,9 @@ object-assign
                 case OffscreenLane:
                   return OffscreenLane;
 
-                default: // This shouldn't be reachable, but as a fallback, return the entire bitmask.
+                default:
                   {
+                    // This shouldn't be reachable, but as a fallback, return the entire bitmask.
                     error(
                       'Should have found matching lanes. This is a bug in React.'
                     );
